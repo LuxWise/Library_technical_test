@@ -1,6 +1,6 @@
 public class Category
 {
     public int Id { get; set; }
-    public string Nombre { get; set; }
-    public List<Book> Libros { get; set; }
+    public string Name { get; set; }
+    public List<Book> Books { get; set; }
 }
