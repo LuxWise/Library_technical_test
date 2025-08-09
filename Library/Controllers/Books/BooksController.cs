@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Library.Data;
+using Library.DTO.Books;
 
 namespace Library.Controllers.Books
 {
@@ -31,7 +32,7 @@ namespace Library.Controllers.Books
         }
 
         [HttpPost]
-        public BooksResponse AddBook([FromBody] Book book)
+        public BooksResponse AddBook([FromBody] BooksRequest book)
         {
             return new BooksResponse{message = "Book added successfully: " + book.Title};
         }
