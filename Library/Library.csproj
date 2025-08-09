@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTO\Books\" />
     <Folder Include="DTO\Categories\" />
   </ItemGroup>
 

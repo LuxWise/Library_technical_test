@@ -20,9 +20,27 @@ namespace Library.Controllers.Books
         }
         
         [HttpGet("{id}")]
-        public String GetBook(int id)
+        public Book GetBook(Guid id)
         {
-            return id.ToString();
+            if (id == Guid.Empty)
+            { 
+                throw new ArgumentException("Invalid book ID");
+            }
+            
+            return _context.Book.Find(id) ?? throw new KeyNotFoundException("Book not found");
         }
+
+        [HttpPost]
+        public BooksResponse AddBook([FromBody] Book book)
+        {
+            return new BooksResponse{message = "Book added successfully: " + book.Title};
+        }
+
+        [HttpPut("{id}")]
+        public BooksResponse UpdateBook(Guid id, [FromBody] Book book)
+        {
+            return new BooksResponse{message = "Book update successfully: " + book.Title};
+        }
+        
     }
 }
