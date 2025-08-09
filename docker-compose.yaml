@@ -1,11 +1,35 @@
 ﻿services:
-  database_library:
+  database:
     image: mysql:9.4.0
     container_name: library_db
     environment:
-      - MYSQL_ROOT_PASSWORD=admin_password 
+      - MYSQL_ROOT_PASSWORD=admin_password
       - MYSQL_USER=library_admin
       - MYSQL_PASSWORD=library_password
       - MYSQL_DATABASE=library
     ports:
       - "3307:3306"
+    networks:
+      - library_network
+  
+  library:
+    build: ./Library
+    image: luxwise/library:latest
+    container_name: library
+    environment:
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=library
+      - DB_USER=library_admin
+      - DB_PASSWORD=library_password
+    ports:
+      - "8080:8080"
+    networks:
+      - library_network
+    depends_on:
+      - database
+
+
+networks:
+  library_network:
+    driver: bridge
