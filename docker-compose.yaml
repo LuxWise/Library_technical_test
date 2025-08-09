@@ -1,0 +1,11 @@
+﻿services:
+  database_library:
+    image: mysql:9.4.0
+    container_name: library_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin_password 
+      - MYSQL_USER=library_admin
+      - MYSQL_PASSWORD=library_password
+      - MYSQL_DATABASE=library
+    ports:
+      - "3307:3306"
