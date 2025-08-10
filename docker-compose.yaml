@@ -10,16 +10,18 @@
     ports:
       - "3307:3306"
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u library_admin -p$$MYSQL_ROOT_PASSWORD --silent" ]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u library_admin -p$$MYSQL_PASSWORD --silent"]
       interval: 5s
       timeout: 3s
       retries: 20
       start_period: 25s
     networks:
       - library_network
-  
+
   library:
-    build: ./Library
+    build:
+      context: ./Library
+      dockerfile: Dockerfile
     image: luxwise/library:latest
     container_name: library
     environment:
@@ -28,13 +30,14 @@
       - DB_NAME=library
       - DB_USER=library_admin
       - DB_PASSWORD=library_password
+      - ASPNETCORE_URLS=http://+:8080
     ports:
       - "8080:8080"
     networks:
       - library_network
     depends_on:
       database:
-        condition: service_healthy 
+        condition: service_healthy
 
 networks:
   library_network:
