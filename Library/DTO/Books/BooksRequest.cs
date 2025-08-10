@@ -6,6 +6,5 @@ public class BooksRequest
     public string Author { get; set; }
     public string ISBN { get; set; }
     public int PublicationYear { get; set; }
-    public bool Available { get; set; }
     public Guid CategoryId { get; set; }
 }
