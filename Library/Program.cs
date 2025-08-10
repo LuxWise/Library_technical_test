@@ -2,6 +2,8 @@ using System.Text;
 using Library.Data;
 using Library.Options;
 using Library.Services.Auth;
+using Library.Services.Books;
+using Library.Services.Category;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -38,6 +40,8 @@ builder.Services.AddSwaggerGen();
 //  Auth configuration settings
 builder.Services.AddScoped<IAuthService, AuthServices>();
 builder.Services.AddScoped<IRegisterServices, RegisterServices>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IBookServices, BookServices>();
 
 // JWT Bearer
 var jwtSection = builder.Configuration.GetSection("Jwt");

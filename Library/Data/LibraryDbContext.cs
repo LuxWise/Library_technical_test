@@ -49,7 +49,7 @@ namespace Library.Data
                 e.Property(x => x.Title).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Author).IsRequired().HasMaxLength(100);
                 e.Property(x => x.ISBN).IsRequired().HasMaxLength(13);
-                e.Property(x => x.ISBN).IsUnicode();
+                e.HasIndex(x => x.ISBN).IsUnique();
                 e.Property(x => x.PublicationYear).IsRequired();
                 e.Property(x => x.Available).IsRequired();
                 e.HasOne(x => x.Category)
