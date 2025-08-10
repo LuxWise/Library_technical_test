@@ -1,11 +1,13 @@
 using System.Text;
 using Library.Data;
 using Library.Options;
+using Library.Seed;
 using Library.Services.Auth;
 using Library.Services.Auth.Users;
 using Library.Services.Books;
 using Library.Services.Category;
 using Library.Services.Loan;
+using Library.Services.Suggestions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -47,7 +49,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookServices, BookServices>();
 builder.Services.AddScoped<ILoanServices, LoanServices>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
+builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
 
 // JWT Bearer
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -125,6 +127,9 @@ using (var scope = app.Services.CreateScope())
             await Task.Delay(2000);
         }
     }
+    
+    DataSeeder.SeedCategories(dbCtx);
+    DataSeeder.SeedBooks(dbCtx);
 }
 
 app.Run();
