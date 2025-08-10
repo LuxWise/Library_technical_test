@@ -22,8 +22,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Exeptions\" />
-  </ItemGroup>
-
 </Project>

@@ -1,5 +1,8 @@
 using System.Text;
+using System.Text.Json;
 using Library.Data;
+using Library.DTO.Error;
+using Library.Middleware;
 using Library.Options;
 using Library.Seed;
 using Library.Services.Auth;
@@ -51,6 +54,10 @@ builder.Services.AddScoped<ILoanServices, LoanServices>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
 
+//  Middleware configuration
+builder.Services.AddTransient<ExceptionMiddleware>();
+
+
 // JWT Bearer
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
@@ -70,6 +77,41 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ClockSkew = TimeSpan.Zero
+        };
+        
+        
+        o.Events = new JwtBearerEvents
+        {
+            OnChallenge = async ctx =>
+            {
+                ctx.HandleResponse();
+                ctx.Response.StatusCode = 401;
+                ctx.Response.ContentType = "application/json";
+
+                var payload = new ErrorResponse()
+                {
+                    TraceId = ctx.HttpContext.TraceIdentifier,
+                    Status = 401,
+                    Code = "unauthorized",
+                    Title = "Unauthorized",
+                    Detail = "Authentication token is missing or invalid."
+                };
+                await ctx.Response.WriteAsync(JsonSerializer.Serialize(payload));
+            },
+            OnForbidden = async ctx =>
+            {
+                ctx.Response.StatusCode = 403;
+                ctx.Response.ContentType = "application/json";
+                var payload = new ErrorResponse
+                {
+                    TraceId = ctx.HttpContext.TraceIdentifier,
+                    Status = 403,
+                    Code = "forbidden",
+                    Title = "Forbidden",
+                    Detail = "You do not have permission to access this resource."
+                };
+                await ctx.Response.WriteAsync(JsonSerializer.Serialize(payload));
+            }
         };
     });
 
@@ -104,6 +146,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
