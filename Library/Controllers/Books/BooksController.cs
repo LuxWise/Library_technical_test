@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Library.DTO.Books;
 using Library.Services.Books;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Library.Controllers.Books
 {
@@ -15,6 +16,7 @@ namespace Library.Controllers.Books
         }
         
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<List<BooksListItem>>> GetBooks()
         {
             var resp = await _book.GetBooks();
@@ -22,6 +24,7 @@ namespace Library.Controllers.Books
         }
         
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<BookDetail?>> GetBook(Guid id)
         {
             var resp = await _book.GetBookById(id);
@@ -30,6 +33,7 @@ namespace Library.Controllers.Books
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<BooksResponse>> AddBook([FromBody] BooksRequest book)
         {
             var resp = await _book.AddBook(book);
@@ -37,6 +41,7 @@ namespace Library.Controllers.Books
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<BooksResponse?>> UpdateBook(Guid id, [FromBody] BooksRequest book)
         {
             var resp = await _book.UpdateBook(id, book);

@@ -1,6 +1,6 @@
-﻿using Library.Data;
-using Library.DTO.Loan;
-using Library.Model;
+﻿using Library.DTO.Loan;
+using Library.Services.Loan;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Controllers.Loans
@@ -10,47 +10,54 @@ namespace Library.Controllers.Loans
     
     public class LoanController : ControllerBase
     {
-        private readonly LibraryDbContext _context;
+        private readonly ILoanServices _loan;
         
-        public LoanController(LibraryDbContext context)
+        public LoanController(ILoanServices loan)
         {
-            _context = context;
+            _loan = loan;
         }
 
         [HttpGet]
-        public List<Loan> GetLoans()
-        {
-            return _context.Loan.ToList();
+        [Authorize]
+        public async Task<ActionResult<List<LoanListItem>>> GetLoans()
+        { 
+            var resp = await _loan.GetLoans();
+            return Ok(resp);
         }
         
         [HttpGet("{id}")]
-        public Loan GetLoan(Guid id)
+        [Authorize]
+        public async Task<ActionResult<LoanDetails?>> GetLoanById(Guid id)
         {
-            if (id == Guid.Empty)
-            { 
-                throw new ArgumentException("Invalid book ID");
-            }
-            
-            return _context.Loan.Find(id) ?? throw new KeyNotFoundException("Loan not found");
+            var resp = await _loan.GetLoanById(id);
+            if (resp is null) return NotFound(new { message = "Loan not found" });
+            return Ok(resp);
         }
 
         [HttpPost]
-        public LoanResponse CreateLoan([FromBody] LoanResponse loan)
+        [Authorize]
+        public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] LoanRequest loan)
         {
-            return new LoanResponse{message = "Loan created successfully"};
+            var resp = await _loan.AddLoan(loan);
+            return Ok(resp);
         }
 
         [HttpPost("{id}/return")]
-        public LoanResponse ReturnLoan(Guid id)
+        [Authorize]
+        public async Task<ActionResult<LoanResponse>> ReturnLoan(Guid id)
         {
-            return new LoanResponse{message = "Loan returned successfully"};
+            var resp = await _loan.ReturnLoan(id);
+            return Ok(resp);        
         }
 
         [HttpPost("{id}/renew")]
-        public LoanResponse RenewLoan(Guid id)
+        [Authorize]
+        public async Task<ActionResult<LoanResponse>> RenewLoan(Guid id, [FromQuery] int extraDays)
         {
-            return new LoanResponse{message = "Loan renewed successfully"};
+            var resp = await _loan.RenewLoan(id, extraDays);
+            return Ok(resp);
         }
+
         
     }
 }
