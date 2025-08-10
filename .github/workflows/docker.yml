@@ -7,12 +7,10 @@ on:
     branches: [ "main" ]
 
 jobs:
-
-  build:
-
+  docker:
     runs-on: ubuntu-latest
     environment: Docker
-    
+
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4
@@ -25,8 +23,8 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/library_technical_test:latest .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/roomio_web_arq:latest .
 
     - name: Push Docker image
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/library_technical_test:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/roomio_web_arq:latest
