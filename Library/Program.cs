@@ -1,9 +1,15 @@
+using System.Text;
 using Library.Data;
+using Library.Options;
+using Library.Services.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//  Database connection settings
 string host = Environment.GetEnvironmentVariable("DB_HOST") ?? "database";
 string portStr = Environment.GetEnvironmentVariable("DB_PORT") ?? "3306";
 string db   = Environment.GetEnvironmentVariable("DB_NAME") ?? "library";
@@ -21,14 +27,46 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 36));
 builder.Services.AddDbContext<LibraryDbContext>(opt =>
     opt.UseMySql(cs, serverVersion));
 
+//  Jwt configuration settings
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+//  Add services settings
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//  Auth configuration settings
+builder.Services.AddScoped<IAuthService, AuthServices>();
+builder.Services.AddScoped<IRegisterServices, RegisterServices>();
+
+// JWT Bearer
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.SaveToken = true;
+        o.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidIssuer = jwtSection["Issuer"],
+            ValidAudience = jwtSection["Audience"],
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

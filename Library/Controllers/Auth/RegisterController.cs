@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Library.Data;
 using Library.DTO.Auth;
+using Library.Services.Auth;
 
 namespace Library.Controllers.Auth
 {
@@ -9,20 +9,19 @@ namespace Library.Controllers.Auth
 
     public class RegisterController : ControllerBase
     {
-        private readonly LibraryDbContext _context;
+        private readonly IRegisterServices _register;
 
-        public RegisterController(LibraryDbContext context)
+        public RegisterController(IRegisterServices register)
         {
-            _context = context;
+            _register = register;
         }
 
         [HttpPost]
-        public RegisterResponse Register([FromBody] RegisterRequest request)
+        public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest request,  CancellationToken ct)
         {
-            return new RegisterResponse
-            {
-                message = "User registered successfully"
-            };
+            var resp = await _register.Register(request, ct);
+            if (resp is null) return Unauthorized(new { message = "Invalid credentials" });
+            return Ok(resp);
         }
     }
     

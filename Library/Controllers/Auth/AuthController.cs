@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Library.Data;
 using Library.DTO.Auth;
+using Library.Services.Auth;
 
 namespace Library.Controllers.Auth
 {
@@ -9,20 +9,18 @@ namespace Library.Controllers.Auth
 
 	public class AuthController : ControllerBase 
 	{
-		private readonly LibraryDbContext _context;
-		public AuthController(LibraryDbContext context) 
+		private readonly IAuthService _auth;
+		public AuthController(IAuthService auth) 
 		{
-			_context = context;
+			_auth = auth;
 		}
 
 		[HttpPost("login")]
-		public LoginResponse Login([FromBody] LoginRequest request)
+		public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request, CancellationToken ct)
 		{
-			return new LoginResponse
-			{
-				Token = "fasfea",
-				Status = "success"
-			};
+			var resp = await _auth.Login(request, ct);
+			if (resp is null) return Unauthorized(new { message = "Invalid credentials" });
+			return Ok(resp);
 		}
 		
 
