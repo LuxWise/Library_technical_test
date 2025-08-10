@@ -13,6 +13,7 @@ namespace Library.Data
         public DbSet<User> User { get; set; }
         public DbSet<Book> Book { get; set; }
         public DbSet<Category> Category { get; set; }
+        public DbSet<Loan> Loan { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +49,44 @@ namespace Library.Data
                 e.Property(x => x.Name).IsRequired().HasMaxLength(100);
                 e.HasIndex(x => x.Name).IsUnique(); 
             });
+            
+            modelBuilder.Entity<Loan>(e =>
+            {
+                e.ToTable("loans");
+
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id)
+                    .HasColumnType("char(36)")
+                    .HasDefaultValueSql("(UUID())");
+
+                e.Property(x => x.LoanDate).IsRequired();
+                e.Property(x => x.DueDate).IsRequired();
+
+                e.Property(x => x.Status)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                e.Property(x => x.Renewals).HasDefaultValue(0);
+
+                e.HasOne(x => x.User)
+                    .WithMany()          
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Book)
+                    .WithMany(b => b.Loans)
+                    .HasForeignKey(x => x.BookId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasIndex(x => new { x.BookId, x.Status });     
+                e.HasIndex(x => new { x.UserId, x.Status });     
+                e.HasIndex(x => x.DueDate);
+
+                e.HasIndex(x => new { x.BookId, x.Status })
+                    .IsUnique()
+                    .HasFilter("Status = 1");
+            });
+
         }
         
     }
