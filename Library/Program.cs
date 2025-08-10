@@ -2,8 +2,10 @@ using System.Text;
 using Library.Data;
 using Library.Options;
 using Library.Services.Auth;
+using Library.Services.Auth.Users;
 using Library.Services.Books;
 using Library.Services.Category;
+using Library.Services.Loan;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -36,12 +38,16 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 
-//  Auth configuration settings
+//  Services configuration
 builder.Services.AddScoped<IAuthService, AuthServices>();
 builder.Services.AddScoped<IRegisterServices, RegisterServices>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookServices, BookServices>();
+builder.Services.AddScoped<ILoanServices, LoanServices>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 
 // JWT Bearer
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -64,6 +70,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddAuthorization();
+
+// Swagger configuration
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Library API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new()
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Introduce: Bearer {tu_token_jwt}"
+    });
+
+    c.AddSecurityRequirement(new()
+    {
+        {
+            new() { Reference = new() { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "Bearer" } },
+            Array.Empty<string>()
+        }
+    });
+});
 
 
 var app = builder.Build();
