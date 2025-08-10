@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Library.Data;
 using Library.DTO.Books;
+using Library.Services.Books;
 
 namespace Library.Controllers.Books
 {
@@ -8,39 +8,40 @@ namespace Library.Controllers.Books
     [Route("api/books")]
     public class BooksController : ControllerBase
     {
-        private  readonly LibraryDbContext _context;
-        public BooksController(LibraryDbContext context)
+        private  readonly IBookServices _book;
+        public BooksController(IBookServices book)
         {
-            _context = context;
+            _book = book;
         }
         
         [HttpGet]
-        public List<Book> GetBooks()
+        public async Task<ActionResult<List<BooksListItem>>> GetBooks()
         {
-            return _context.Book.ToList();
+            var resp = await _book.GetBooks();
+            return Ok(resp);        
         }
         
         [HttpGet("{id}")]
-        public Book GetBook(Guid id)
+        public async Task<ActionResult<BookDetail?>> GetBook(Guid id)
         {
-            if (id == Guid.Empty)
-            { 
-                throw new ArgumentException("Invalid book ID");
-            }
-            
-            return _context.Book.Find(id) ?? throw new KeyNotFoundException("Book not found");
+            var resp = await _book.GetBookById(id);
+            if (resp is null) return NotFound(new { message = "Book not found" });
+            return Ok(resp);
         }
 
         [HttpPost]
-        public BooksResponse AddBook([FromBody] BooksRequest book)
+        public async Task<ActionResult<BooksResponse>> AddBook([FromBody] BooksRequest book)
         {
-            return new BooksResponse{message = "Book added successfully: " + book.Title};
+            var resp = await _book.AddBook(book);
+            return Ok(resp);
         }
 
         [HttpPut("{id}")]
-        public BooksResponse UpdateBook(Guid id, [FromBody] Book book)
+        public async Task<ActionResult<BooksResponse?>> UpdateBook(Guid id, [FromBody] BooksRequest book)
         {
-            return new BooksResponse{message = "Book update successfully: " + book.Title};
+            var resp = await _book.UpdateBook(id, book);
+            if (resp is null) return NotFound(new { message = "Book doesn't update" });
+            return Ok(resp);        
         }
         
     }

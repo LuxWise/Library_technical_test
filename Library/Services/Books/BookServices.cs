@@ -81,6 +81,12 @@ namespace Library.Services.Books
             _db.Book.Add(book);
             await _db.SaveChangesAsync(ct);
 
+            var categoryName = await _db.Category
+                .AsNoTracking()
+                .Where(c => c.Id == request.CategoryId)
+                .Select(c => c.Name)
+                .FirstAsync(ct);
+
             return new BooksResponse
             {
                 message = "Book added successfully",
@@ -91,7 +97,7 @@ namespace Library.Services.Books
                     book.ISBN,
                     book.PublicationYear,
                     book.CategoryId,
-                    book.Category.Name,
+                    categoryName,
                     book.Available,
                     book.CreatedAt,
                     book.UpdatedAt
@@ -120,7 +126,6 @@ namespace Library.Services.Books
                     throw new InvalidOperationException("ISBN already exists.");
             }
             
-            
             book.Title = request.Title.Trim();
             book.Author = request.Author.Trim();
             book.ISBN = request.ISBN.Trim();
@@ -130,6 +135,12 @@ namespace Library.Services.Books
 
             await _db.SaveChangesAsync(ct);
 
+            var categoryName = await _db.Category
+                .AsNoTracking()
+                .Where(c => c.Id == request.CategoryId)
+                .Select(c => c.Name)
+                .FirstAsync(ct);
+            
             return new BooksResponse
             {
                 message = "Book updated successfully",
@@ -140,7 +151,7 @@ namespace Library.Services.Books
                     book.ISBN,
                     book.PublicationYear,
                     book.CategoryId,
-                    book.Category.Name,
+                    categoryName,
                     book.Available,
                     book.CreatedAt,
                     book.UpdatedAt
