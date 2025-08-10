@@ -23,7 +23,8 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/library_technical_test:latest .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/library_technical_test:latest \
+          -f Library/Dockerfile Library
 
     - name: Push Docker image
       run: |
