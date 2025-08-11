@@ -8,15 +8,21 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Library.csproj", "./"]
-RUN dotnet restore "Library.csproj"
-COPY . .
-RUN dotnet build "Library.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+COPY ./Library/Library.csproj ./Library/
+COPY ./Metrics/Metrics.csproj ./Metrics/
+
+RUN dotnet restore ./Library/Library.csproj
+
+COPY ./Library ./Library
+COPY ./Metrics ./Metrics
+
+RUN dotnet build ./Library/Library.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 # publish
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Library.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish ./Library/Library.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # final
 FROM base AS final
