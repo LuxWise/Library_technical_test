@@ -40,6 +40,8 @@
         condition: service_healthy
         
   log-worker:
+    image: luxwise/log-worker:latest
+    container_name: log_worker
     build:
       context: .                 
       dockerfile: ./LogWorker/Dockerfile
