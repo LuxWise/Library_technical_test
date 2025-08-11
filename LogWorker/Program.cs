@@ -1,4 +1,4 @@
-using LogWorker.Logs;
+using LogWorker.LogsBackground;
 using LogWorker.Services;
 using Metrics.Data;
 using Microsoft.EntityFrameworkCore;

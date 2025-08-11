@@ -1,3 +1,4 @@
+<!-- LogWorker/LogWorker.csproj -->
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
@@ -16,10 +17,14 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
-    <ProjectReference Include="..\Metrics\Metrics.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Metrics\Metrics.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Logs/**/*.cs" />
+  </ItemGroup>
+
 </Project>
