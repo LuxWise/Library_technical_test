@@ -27,7 +27,7 @@ jobs:
       - name: Build & Push Library
         uses: docker/build-push-action@v6
         with:
-          context: ./Library
+          context: .
           file: ./Library/Dockerfile
           push: true
           tags: |
