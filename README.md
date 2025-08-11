@@ -145,6 +145,16 @@ Se desplegó en un servidor Linux con Docker:
 
 ---
 
+## 🌍 Demo en línea
+
+El proyecto está desplegado y disponible públicamente en:
+
+[https://library-api.lux-wise.com/swagger](https://library-api.lux-wise.com/swagger)
+
+Accede a la documentación interactiva de la API y prueba los endpoints directamente desde Swagger UI.
+
+---
+
 ## 📌 Notas finales
 
 - API y Worker comparten la misma base de datos y librería de métricas.

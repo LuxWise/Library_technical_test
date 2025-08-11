@@ -20,8 +20,8 @@
 
   library:
     build:
-      context: ./Library
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./Library/Dockerfile
     image: luxwise/library:latest
     container_name: library
     environment:
