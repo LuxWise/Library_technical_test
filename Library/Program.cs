@@ -10,11 +10,14 @@ using Library.Services.Auth.Users;
 using Library.Services.Books;
 using Library.Services.Category;
 using Library.Services.Loan;
+using Library.Services.Metric;
 using Library.Services.Suggestions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MySqlConnector;
+using Metrics;
+using Metrics.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +39,9 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 36));
 builder.Services.AddDbContext<LibraryDbContext>(opt =>
     opt.UseMySql(cs, serverVersion));
 
+builder.Services.AddDbContext<MetricsDbContext>(opt =>
+    opt.UseMySql(cs, serverVersion));
+
 //  Jwt configuration settings
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
@@ -53,6 +59,7 @@ builder.Services.AddScoped<IBookServices, BookServices>();
 builder.Services.AddScoped<ILoanServices, LoanServices>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
+builder.Services.AddScoped<IMetricServices, MetricServices>();
 
 //  Middleware configuration
 builder.Services.AddTransient<ExceptionMiddleware>();

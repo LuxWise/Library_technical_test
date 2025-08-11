@@ -35,6 +35,8 @@
       - "8080:8080"
     networks:
       - library_network
+    volumes:
+      - ./logs:/logs
     depends_on:
       database:
         condition: service_healthy
@@ -54,9 +56,13 @@
       - Logs__WatchPath=/logs
       - Logs__Pattern="*.log"
     volumes:
-      - ./logs:/logs              
+      - ./logs:/logs
+    networks:
+      - library_network
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+      
 
 networks:
   library_network:
