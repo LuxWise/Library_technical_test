@@ -31,4 +31,28 @@ builder.Services.AddDbContext<MetricsDbContext>(opt =>
 builder.Services.AddHostedService<LogIngestionBackgroundService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var dbCtx  = scope.ServiceProvider.GetRequiredService<MetricsDbContext>();
+
+    for (int i = 1; i <= 5; i++)
+    {
+        try
+        {
+            dbCtx.Database.Migrate();
+            logger.LogInformation("Migration apply.");
+            break;
+        }
+        catch (MySqlException ex) when (i < 5)
+        {
+            logger.LogWarning(ex, "DB it is not ready {Try}/5 in 2s...", i);
+            await Task.Delay(2000);
+        }
+    }
+    
+    
+}
+
 app.Run();
