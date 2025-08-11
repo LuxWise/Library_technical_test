@@ -1,4 +1,4 @@
-﻿namespace LogWorker.Logs;
+﻿namespace LogWorker.LogsBackground;
 
 public class LogOptions
 {

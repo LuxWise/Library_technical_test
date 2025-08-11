@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using LogWorker.Logs;
+using LogWorker.LogsBackground;
 using Microsoft.Extensions.Options;
 using Metrics.Data;
 using Metrics.Model;
