@@ -30,7 +30,7 @@ services:
     - "/app/bin/Debug/net8.0/LogWorker.dll"
     environment:
       DOTNET_ENVIRONMENT: "Development"
-    image: "logworker:dev"
+    image: "luxwise/log-worker:dev"
     ports: []
     volumes:
     - "C:\\Users\\sanch\\source\\repos\\Library\\LogWorker:/app:rw"
