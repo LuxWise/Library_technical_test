@@ -1,0 +1,39 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  library:
+    build:
+      context: "C:\\Users\\sanch\\source\\repos\\Library\\Library"
+      dockerfile: "Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/Library.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "luxwise/library:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\sanch\\source\\repos\\Library\\Library:/app:rw"
+    - "C:\\Users\\sanch\\source\\repos\\Library:/src:rw"
+    - "C:\\Users\\sanch\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"
+  log-worker:
+    build:
+      context: "C:\\Users\\sanch\\source\\repos\\Library"
+      dockerfile: "./LogWorker/Dockerfile"
+      target: "build"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/LogWorker.dll"
+    environment:
+      DOTNET_ENVIRONMENT: "Development"
+    image: "logworker:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\sanch\\source\\repos\\Library\\LogWorker:/app:rw"
+    - "C:\\Users\\sanch\\source\\repos\\Library:/src:rw"
+    - "C:\\Users\\sanch\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"

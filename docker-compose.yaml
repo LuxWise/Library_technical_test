@@ -38,6 +38,23 @@
     depends_on:
       database:
         condition: service_healthy
+        
+  log-worker:
+    build:
+      context: .                 
+      dockerfile: ./LogWorker/Dockerfile
+    environment:
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=library
+      - DB_USER=library_admin
+      - DB_PASSWORD=library_password
+      - Logs__WatchPath=/logs
+      - Logs__Pattern="*.log"
+    volumes:
+      - ./logs:/logs              
+    depends_on:
+      - database
 
 networks:
   library_network:
