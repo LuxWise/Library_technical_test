@@ -40,6 +40,9 @@ jobs:
           context: .
           file: ./LogWorker/Dockerfile
           push: true
+          build-args: |
+            BUILD_CONFIGURATION=Release
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/log-worker:latest
             ${{ secrets.DOCKER_USERNAME }}/log-worker:${{ github.sha }}
+
