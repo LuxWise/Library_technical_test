@@ -5,36 +5,40 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-    
+
 jobs:
   docker:
     runs-on: ubuntu-latest
-    environment: Docker
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build Library Image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/library_technical_test:latest \
-          -f Library/Dockerfile Library
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Push Library Iamge
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/library_technical_test:latest
+      - name: Build & Push Library
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Library
+          file: ./Library/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/library:latest
+            ${{ secrets.DOCKER_USERNAME }}/library:${{ github.sha }}
 
-    - name: Build LogWorker Image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/logWorker_technical_test:latest .
-
-    - name: Push LogWorker Iamge
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/logWorker_technical_test:latest
-
+      - name: Build & Push LogWorker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./LogWorker/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/log-worker:latest
+            ${{ secrets.DOCKER_USERNAME }}/log-worker:${{ github.sha }}
